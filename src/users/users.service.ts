@@ -21,6 +21,16 @@ export class UsersService {
     return user;
   }
 
+  public findOneByTag(tagId: string): UserModel {
+    const user: UserModel = this.users.find((user) => user.tagId === tagId);
+
+    if (!user) {
+      throw new NotFoundException('User tag not found.');
+    }
+
+    return user;
+  }
+
   public create(user: UserModel) {
     const nameExists: boolean = this.users.some(
       (userIterated) => userIterated.name === user.name,

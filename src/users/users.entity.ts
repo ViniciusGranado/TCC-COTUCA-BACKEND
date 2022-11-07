@@ -23,6 +23,9 @@ export class User {
   @Column({ type: 'boolean', default: false, nullable: false })
   admin: boolean;
 
+  @Column({ type: 'varchar', default: false, nullable: false, unique: true })
+  tagId: string;
+
   @Column({ nullable: false })
   appNotification: boolean;
 

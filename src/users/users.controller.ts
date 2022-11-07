@@ -25,6 +25,11 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get('/tag/:tagId')
+  public find(@Param('tagId') tagId: string): UserModel {
+    return this.usersService.findOneByTag(tagId);
+  }
+
   @Post()
   public create(@Body() user: UserModel): UserModel {
     return this.usersService.create(user);
