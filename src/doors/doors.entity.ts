@@ -11,4 +11,7 @@ export class Door {
 
   @Column({ type: 'varchar', nullable: false })
   size: number;
+
+  @Column({type: 'int', unique:true, nullable: false})
+  id: string;
 }

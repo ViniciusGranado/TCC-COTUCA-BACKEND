@@ -15,5 +15,5 @@ export class Package {
   receivementDate: string;
 
   @Column({ type: 'date', nullable: false })
-  takeOffDate: string;
+  retrievalDate: string;
 }
