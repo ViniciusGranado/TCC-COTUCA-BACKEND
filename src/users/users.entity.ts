@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class User {
+export class User { 
   @PrimaryGeneratedColumn({ type: 'int' })
-  tag: number;
+  userId: number;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
-  lastName: string;
+  surname: string;
 
   @Column({ type: 'int', nullable: false })
   age: number;
