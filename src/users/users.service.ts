@@ -1,12 +1,20 @@
 import {
   Injectable,
+  Inject,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { UserModel } from './users.interface';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @Inject('USERS_REPOSITORY')
+    private usersRepository: Repository<User>,
+  ) { }
+
+
   private users: Array<UserModel> = [];
   public findAll(): Array<UserModel> {
     return this.users;
@@ -22,7 +30,8 @@ export class UsersService {
   }
 
   public findOneByTag(tagId: string): UserModel {
-    const user: UserModel = this.users.find((user) => user.tagId === tagId);
+    // const user: UserModel = this.users.find((user) => user.tagId === tagId);
+    const user = this.usersRepository.
 
     if (!user) {
       throw new NotFoundException('User tag not found.');

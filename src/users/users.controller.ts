@@ -27,7 +27,8 @@ export class UsersController {
 
   @Get('/tag/:tagId')
   public find(@Param('tagId') tagId: string): UserModel {
-    return this.usersService.findOneByTag(tagId);
+    // return this.usersService.findOneByTag(tagId);
+  return this.usersService.
   }
 
   @Post()
