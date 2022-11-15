@@ -49,12 +49,22 @@ export class UsersService {
       throw new NotFoundException('User tag not found.');
     }
 
+    const response: TagRequestAnswer = {
+      userId: user.userId,
+      userTag: user.tagId,
+      hasPackage: false,
+    };
+
     const packages = await this.packagesRepository
       .createQueryBuilder('package')
       .where('package.userId = :userId', { userId: user.userId })
       .andWhere('package.retrieved = :retrievedStatus', {retrievedStatus: false})
       .printSql()
       .getMany();
+
+    if (packages.length === 0) {
+      return response;
+    };
 
     const doors = await this.doorsRepository
       .createQueryBuilder('door')
@@ -64,13 +74,8 @@ export class UsersService {
 
     const doorsIDs = doors.map((door) => Number(door.id));
 
-    const response: TagRequestAnswer = {
-      userId: user.userId,
-      userTag: user.tagId,
-      hasPackage: doorsIDs.length !== 0,
-    };
-
-    if (response.hasPackage) response.packageDoors = doorsIDs;
+    response.hasPackage = true;
+    response.packageDoors = doorsIDs;
 
     return response;
   }
