@@ -1,4 +1,4 @@
-export interface TagRequestDTO {
+export interface TagRequestAnswer {
   userId: number;
   userTag: string;
   hasPackage: boolean;
