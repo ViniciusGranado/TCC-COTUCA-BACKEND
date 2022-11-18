@@ -1,12 +1,30 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
+  PreconditionFailedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { DoorRequest, DoorResponse } from 'src/models/models';
+import { Package } from 'src/packages/packages.entity';
+import { User } from 'src/users/users.entity';
+import { Repository } from 'typeorm';
+import { Door } from './doors.entity';
 import { DoorModel } from './doors.interface';
 
 @Injectable()
 export class DoorsService {
+  constructor(
+    @Inject('USERS_REPOSITORY')
+    private usersRepository: Repository<User>,
+
+    @Inject('PACKAGES_REPOSITORY')
+    private packagesRepository: Repository<Package>,
+    
+    @Inject('DOORS_REPOSITORY')
+    private doorsRepository: Repository<Door>,
+  ) {}
+
   private doors: Array<DoorModel> = [];
   public findAll(): Array<DoorModel> {
     return this.doors;
@@ -60,5 +78,51 @@ export class DoorsService {
     };
     this.doors[index] = doorPost;
     return doorPost;
+  }
+
+  public async requestDoor(doorRequest: DoorRequest): Promise<DoorResponse> {
+    const door = await this.doorsRepository
+      .createQueryBuilder('door')
+      .where('door.packageId IS NULL')
+      .andWhere('door.size = :size', { size: doorRequest.size })
+      .printSql()
+      .getOne();
+    
+    if (!door) {
+      throw new PreconditionFailedException('Door with the given specification not available');
+    }
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    
+    const todayString = yyyy + '-' + mm + '-' + dd;
+
+    const packageInsertResult = await this.packagesRepository
+      .createQueryBuilder('package')
+      .insert()
+      .into(Package)
+      .values({
+          userId: doorRequest.userId,
+          receivementDate: todayString,
+          retrieved: false,
+      })
+      .execute();
+
+    const newPackageId: number = packageInsertResult.raw.insertId;
+
+    await this.doorsRepository
+      .createQueryBuilder('door')
+      .update(Door)
+      .set({ packageId: newPackageId })
+      .where("id = :id", { id: door.id })
+      .execute();
+
+    return {
+      packageId: newPackageId,
+      doorId: door.id,
+      doorNumber: door.doorNumber,
+    };
   }
 }
