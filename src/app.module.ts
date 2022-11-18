@@ -6,6 +6,7 @@ import { join } from 'path';
 import { DoorModule } from './doors/doors.module';
 import { UsersModule } from './users/users.module';
 import { PackagesModule } from './packages/packages.module';
+import { DoorRequestModule } from './doorRequest/doorRequest.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -21,6 +22,7 @@ import { PackagesModule } from './packages/packages.module';
     DoorModule,
     UsersModule,
     PackagesModule,
+    DoorRequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],
