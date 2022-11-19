@@ -117,7 +117,7 @@ export class DoorsService {
       .where("id = :id", { id: door.id })
       .execute();
 
-    this.doorRequestRepository
+    await this.doorRequestRepository
       .createQueryBuilder('doorRequest')
       .insert()
       .into(DoorRequest)

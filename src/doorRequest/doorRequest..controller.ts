@@ -8,7 +8,7 @@ export class DoorRequestController {
   constructor(private readonly doorsService: DoorRequestService) {}
 
   @Get()
-  public findAll(): Array<DoorRequestModel> {
+  public findAll(): Promise<Array<DoorRequestModel>> {
     return this.doorsService.findAll();
   }
 }
