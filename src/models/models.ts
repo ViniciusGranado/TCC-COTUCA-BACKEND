@@ -5,7 +5,7 @@ export interface TagRequestAnswer {
   packageDoors?: number[];
 }
 
-export interface DoorRequest {
+export interface DoorRequestDto {
   userId: number;
   size: string;
 }

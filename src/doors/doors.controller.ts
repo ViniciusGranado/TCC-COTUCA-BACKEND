@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { DoorRequest, DoorResponse } from 'src/models/models';
+import { DoorRequestDto, DoorResponse } from 'src/models/models';
 import { DoorModel } from './doors.interface';
 import { DoorsService } from './doors.service';
 
@@ -44,7 +44,7 @@ export class DoorController {
   }
 
   @Post('new-door')
-  public requestDoor(@Body() doorRequest: DoorRequest): Promise<DoorResponse> {
+  public requestDoor(@Body() doorRequest: DoorRequestDto): Promise<DoorResponse> {
     return this.doorsService.requestDoor(doorRequest);
   }
 }

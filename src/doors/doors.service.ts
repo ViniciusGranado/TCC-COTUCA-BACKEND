@@ -1,16 +1,11 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  PreconditionFailedException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { DoorRequest, DoorResponse } from 'src/models/models';
-import { Package } from 'src/packages/packages.entity';
-import { User } from 'src/users/users.entity';
-import { Repository } from 'typeorm';
-import { Door } from './doors.entity';
-import { DoorModel } from './doors.interface';
+import { Inject, Injectable, NotFoundException, PreconditionFailedException, UnprocessableEntityException } from "@nestjs/common";
+import { DoorRequest } from "src/doorRequest/doorRequest.entity";
+import { DoorRequestDto, DoorResponse } from "src/models/models";
+import { Package } from "src/packages/packages.entity";
+import { User } from "src/users/users.entity";
+import { Repository } from "typeorm";
+import { Door } from "./doors.entity";
+import { DoorModel } from "./doors.interface";
 
 @Injectable()
 export class DoorsService {
@@ -23,6 +18,9 @@ export class DoorsService {
     
     @Inject('DOORS_REPOSITORY')
     private doorsRepository: Repository<Door>,
+
+    @Inject('DOOR_REQUEST_REPOSITORY')
+    private doorRequestRepository: Repository<DoorRequest>,
   ) {}
 
   private doors: Array<DoorModel> = [];
@@ -80,7 +78,7 @@ export class DoorsService {
     return doorPost;
   }
 
-  public async requestDoor(doorRequest: DoorRequest): Promise<DoorResponse> {
+  public async requestDoor(doorRequest: DoorRequestDto): Promise<DoorResponse> {
     const door = await this.doorsRepository
       .createQueryBuilder('door')
       .where('door.packageId IS NULL')
@@ -117,6 +115,16 @@ export class DoorsService {
       .update(Door)
       .set({ packageId: newPackageId })
       .where("id = :id", { id: door.id })
+      .execute();
+
+    this.doorRequestRepository
+      .createQueryBuilder('doorRequest')
+      .insert()
+      .into(DoorRequest)
+      .values({
+        doorId: door.id,
+        doorNumber: door.doorNumber,
+      })
       .execute();
 
     return {
