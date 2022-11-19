@@ -7,7 +7,7 @@ import {
 import { Door } from 'src/doors/doors.entity';
 import { TagRequestAnswer } from 'src/models/models';
 import { Package } from 'src/packages/packages.entity';
-import { Repository, EntityManager } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { UserModel } from './users.interface';
 
@@ -44,7 +44,7 @@ export class UsersService {
       .where("user.tagId = :id", { id: tagId })
       .printSql()
       .getOne();
-      
+
     if (!user) {
       throw new NotFoundException('User tag not found.');
     }
@@ -71,6 +71,25 @@ export class UsersService {
       .where('door.packageId IN (:packageId)', { packageId: packages.map((p) => p.id) })
       .printSql()
       .getMany();
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    
+    const todayString = yyyy + '-' + mm + '-' + dd;
+
+    await this.packagesRepository.createQueryBuilder('package')
+      .update(Package)
+      .set({ retrieved: true, retrievalDate: todayString })
+      .where('package.id IN (:...ids)', { ids: doors.map((door) => door.packageId) })
+      .execute();
+
+    await this.doorsRepository.createQueryBuilder('door')
+      .update(Door)
+      .set({ packageId: null })
+      .where('door.id IN (:...doorIds)', { doorIds: doors.map((door) => door.id) })
+      .execute();
 
     const doorsIDs = doors.map((door) => Number(door.id));
 

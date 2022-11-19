@@ -4,21 +4,10 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Door } from 'src/doors/doors.entity';
-import { Repository } from 'typeorm';
-import { Package } from './packages.entity';
 import { PackagesModel } from './packages.interface';
 
 @Injectable()
 export class PackagesService {
-  constructor(
-    @Inject('PACKAGES_REPOSITORY')
-    private packagesRepository: Repository<Package>,
-
-    @Inject('DOORS_REPOSITORY')
-    private doorsRepository: Repository<Door>,
-  ) {}
-
   private packages: Array<PackagesModel> = [];
 
   public findAll(): Array<PackagesModel> {
@@ -83,32 +72,5 @@ export class PackagesService {
 
     this.packages[index] = packgPost;
     return packgPost;
-  }
-
-  public async updatePackageStatusByDoorId(doorId: number) {
-    const door = await this.doorsRepository
-      .createQueryBuilder('door')
-      .where('door.id = :doorId', { doorId: doorId })
-      .printSql()
-      .getOne();
-
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    
-    const todayString = yyyy + '-' + mm + '-' + dd;
-
-    await this.packagesRepository.createQueryBuilder('package')
-      .update(Package)
-      .set({ retrieved: true, retrievalDate: todayString })
-      .where('package.id = :id', { id: door.packageId })
-      .execute();
-
-    await this.doorsRepository.createQueryBuilder('door')
-      .update(Door)
-      .set({ packageId: null })
-      .where('door.id = :doorId', { doorId: doorId })
-      .execute();
   }
 }

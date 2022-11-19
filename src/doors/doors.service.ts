@@ -1,8 +1,8 @@
-import { Inject, Injectable, NotFoundException, PreconditionFailedException, UnprocessableEntityException } from "@nestjs/common";
-import { DoorRequest } from "src/doorRequest/doorRequest.entity";
-import { DoorRequestDto, DoorResponse } from "src/models/models";
-import { Package } from "src/packages/packages.entity";
-import { User } from "src/users/users.entity";
+import { Injectable, Inject, NotFoundException, UnprocessableEntityException, PreconditionFailedException } from "@nestjs/common";
+import { DoorRequest } from "../doorRequest/doorRequest.entity";
+import { DoorRequestDto, DoorResponse } from "../models/models";
+import { Package } from "../packages/packages.entity";
+import { User } from "../users/users.entity";
 import { Repository } from "typeorm";
 import { Door } from "./doors.entity";
 import { DoorModel } from "./doors.interface";
