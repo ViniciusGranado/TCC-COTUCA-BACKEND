@@ -15,7 +15,7 @@ export class User {
   age: number;
 
   @Column({ type: 'varchar', length: 11 })
-  telephone: number;
+  telephone: string;
 
   @Column({ type: 'varchar', length: 50 })
   email: string;
@@ -25,6 +25,9 @@ export class User {
 
   @Column({ type: 'varchar', default: false, nullable: false, unique: true })
   tagId: string;
+
+  @Column({ type: 'varchar', default: false, nullable: false })
+  password: string;
 
   @Column({ nullable: false })
   appNotification: boolean;
