@@ -6,8 +6,8 @@ import { User } from "../users/users.entity";
 import { Repository } from "typeorm";
 import { Door } from "./doors.entity";
 import { DoorModel } from "./doors.interface";
-import { threadId } from "worker_threads";
 import { Log } from "../logs/logs.entity";
+import { sendPushNotification } from "../util/sendPushNotification";
 
 @Injectable()
 export class DoorsService {
@@ -132,17 +132,21 @@ export class DoorsService {
       })
       .execute();
 
+    const message = `Nova encomenda recebida na porta ${door.doorNumber}!`
+
     await this.logsRepository
       .createQueryBuilder('log')
       .insert()
       .into(Log)
       .values({
         userId: doorRequest.userId,
-        text: `Nova encomenda recebida na porta ${door.doorNumber}!`,
+        text: message,
         date: todayString,
       })
       .execute();
 
+    await sendPushNotification(message, String(doorRequest.userId))
+    
     return {
       packageId: newPackageId,
       doorId: door.id,

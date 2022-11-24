@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { Log } from '../logs/logs.entity';
 import { User } from './users.entity';
 import { UserModel } from './users.interface';
+import { sendPushNotification } from '../util/sendPushNotification'
 
 @Injectable()
 export class UsersService {
@@ -104,16 +105,20 @@ export class UsersService {
       .where('door.id IN (:...doorIds)', { doorIds: doors.map((door) => door.id) })
       .execute();
 
+    const message = 'Sua encomenda foi retirada!'
+
     doors.forEach(async () => {
       await this.logsRepository.createQueryBuilder('log')
         .insert()
         .into(Log)
         .values({
           userId: user.userId,
-          text: 'Sua encomenda foi retirada!',
+          text: message,
           date: todayString,
         })
         .execute();
+
+      await sendPushNotification(message, String(user.userId))
     });
 
     const doorsIDs = doors.map((door) => Number(door.id));
