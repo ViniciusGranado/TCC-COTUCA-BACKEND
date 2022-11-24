@@ -24,6 +24,7 @@ export class LogsService {
     const logs = await this.logsRepository
       .createQueryBuilder('log')
       .where('log.userId = :id', { id: id })
+      .orderBy('log.date', 'DESC')
       .getMany();
 
     return logs;
