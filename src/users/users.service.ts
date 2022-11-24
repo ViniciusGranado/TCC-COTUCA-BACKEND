@@ -11,7 +11,6 @@ import { Package } from 'src/packages/packages.entity';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { UserModel } from './users.interface';
-import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -21,18 +20,26 @@ export class UsersService {
 
     @Inject('PACKAGES_REPOSITORY')
     private packagesRepository: Repository<Package>,
-    
+
     @Inject('DOORS_REPOSITORY')
     private doorsRepository: Repository<Door>,
-  ) {}
+  ) { }
 
   private users: Array<UserModel> = [];
-  public findAll(): Array<UserModel> {
-    return this.users;
+
+  public async findAll(): Promise<Array<UserModel>> {
+    const users = await this.usersRepository
+      .createQueryBuilder('user')
+      .getMany();
+
+    return users;
   }
 
-  public findOne(id: number): UserModel {
-    const user: UserModel = this.users.find((user) => user.userId === id);
+  public async findOne(id: number): Promise<UserModel> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.userId = :id', { id: id })
+      .getOne();
 
     if (!user) {
       throw new NotFoundException('User not found.');
@@ -60,7 +67,7 @@ export class UsersService {
     const packages = await this.packagesRepository
       .createQueryBuilder('package')
       .where('package.userId = :userId', { userId: user.userId })
-      .andWhere('package.retrieved = :retrievedStatus', {retrievedStatus: false})
+      .andWhere('package.retrieved = :retrievedStatus', { retrievedStatus: false })
       .printSql()
       .getMany();
 
@@ -78,7 +85,7 @@ export class UsersService {
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = today.getFullYear();
-    
+
     const todayString = yyyy + '-' + mm + '-' + dd;
 
     await this.packagesRepository.createQueryBuilder('package')
@@ -154,7 +161,7 @@ export class UsersService {
 
     return userPost;
   }
-  
+
   public async login(loginDto: LoginDto): Promise<LoginResponse> {
     const user = await this.usersRepository
       .createQueryBuilder('user')
@@ -166,7 +173,7 @@ export class UsersService {
     }
 
     const response: LoginResponse = {
-      token: jwt.sign(loginDto),
+      token: 'token',
       user: {
         userId: user.userId,
         name: user.name,

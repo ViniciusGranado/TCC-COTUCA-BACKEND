@@ -17,12 +17,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  public findAll(): Array<UserModel> {
+  public findAll(): Promise<Array<UserModel>> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  public findOne(@Param('id', ParseIntPipe) id: number): UserModel {
+  public findOne(@Param('id', ParseIntPipe) id: number): Promise<UserModel> {
     return this.usersService.findOne(id);
   }
 
