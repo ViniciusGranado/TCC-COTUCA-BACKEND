@@ -6,6 +6,8 @@ import { User } from "../users/users.entity";
 import { Repository } from "typeorm";
 import { Door } from "./doors.entity";
 import { DoorModel } from "./doors.interface";
+import { threadId } from "worker_threads";
+import { Log } from "../logs/logs.entity";
 
 @Injectable()
 export class DoorsService {
@@ -21,6 +23,9 @@ export class DoorsService {
 
     @Inject('DOOR_REQUEST_REPOSITORY')
     private doorRequestRepository: Repository<DoorRequest>,
+
+    @Inject('LOGS_REPOSITORY')
+    private logsRepository: Repository<Log>,
   ) {}
 
   private doors: Array<DoorModel> = [];
@@ -124,6 +129,17 @@ export class DoorsService {
       .values({
         doorId: door.id,
         doorNumber: door.doorNumber,
+      })
+      .execute();
+
+    await this.logsRepository
+      .createQueryBuilder('log')
+      .insert()
+      .into(Log)
+      .values({
+        userId: doorRequest.userId,
+        text: `Nova encomenda recebida na porta ${door.doorNumber}!`,
+        date: todayString,
       })
       .execute();
 

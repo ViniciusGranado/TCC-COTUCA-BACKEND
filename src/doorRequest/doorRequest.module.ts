@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { DoorRequestController } from "./doorRequest..controller";
+import { DoorRequestController } from "./doorRequest.controller";
 import { doorRequestProviders } from "./doorRequest.provider";
 import { DoorRequestService } from "./doorRequest.service";
 

@@ -9,6 +9,7 @@ import { Door } from 'src/doors/doors.entity';
 import { LoginDto, LoginResponse, TagRequestAnswer } from 'src/models/models';
 import { Package } from 'src/packages/packages.entity';
 import { Repository } from 'typeorm';
+import { Log } from '../logs/logs.entity';
 import { User } from './users.entity';
 import { UserModel } from './users.interface';
 
@@ -23,6 +24,9 @@ export class UsersService {
 
     @Inject('DOORS_REPOSITORY')
     private doorsRepository: Repository<Door>,
+
+    @Inject('LOGS_REPOSITORY')
+    private logsRepository: Repository<Log>,
   ) { }
 
   private users: Array<UserModel> = [];
@@ -99,6 +103,18 @@ export class UsersService {
       .set({ packageId: null })
       .where('door.id IN (:...doorIds)', { doorIds: doors.map((door) => door.id) })
       .execute();
+
+    doors.forEach(async () => {
+      await this.logsRepository.createQueryBuilder('log')
+        .insert()
+        .into(Log)
+        .values({
+          userId: user.userId,
+          text: 'Sua encomenda foi retirada!',
+          date: todayString,
+        })
+        .execute();
+    });
 
     const doorsIDs = doors.map((door) => Number(door.id));
 

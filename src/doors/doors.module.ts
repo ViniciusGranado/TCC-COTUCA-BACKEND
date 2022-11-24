@@ -5,6 +5,7 @@ import { doorsProviders } from './doors.provider';
 import { packagesProviders } from 'src/packages/packages.provider';
 import { usersProviders } from 'src/users/users.providers';
 import { doorRequestProviders } from 'src/doorRequest/doorRequest.provider';
+import { logsProviders } from '../logs/logs.providers';
 
 @Module({
   providers: [
@@ -12,7 +13,8 @@ import { doorRequestProviders } from 'src/doorRequest/doorRequest.provider';
     ...doorsProviders,
     ...packagesProviders,
     ...usersProviders,
-    ...doorRequestProviders
+    ...doorRequestProviders,
+    ...logsProviders,
   ],
   controllers: [DoorController],
   exports: [DoorsService],
