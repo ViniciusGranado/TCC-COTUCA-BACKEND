@@ -7,6 +7,7 @@ import { DoorModule } from './doors/doors.module';
 import { UsersModule } from './users/users.module';
 import { PackagesModule } from './packages/packages.module';
 import { DoorRequestModule } from './doorRequest/doorRequest.module';
+import { LogsModule } from './logs/logs.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -23,6 +24,7 @@ import { DoorRequestModule } from './doorRequest/doorRequest.module';
     UsersModule,
     PackagesModule,
     DoorRequestModule,
+    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
