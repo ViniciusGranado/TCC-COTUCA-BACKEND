@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -130,24 +131,32 @@ export class UsersService {
   }
 
   public async create(user: UserModel): Promise<number> {
-    const newUser = await this.usersRepository
-      .createQueryBuilder('user')
-      .insert()
-      .into(User)
-      .values({
-        name: user.name,
-        surname: user.surname,
-        age: user.age,
-        telephone: user.telephone,
-        email: user.email,
-        password: user.password,
-        admin: false,
-        appNotification: user.appNotification,
-        emailNotification: user.appNotification,
-        intercomNotification: user.intercomNotification,
-        tagId: user.tagId,
-      })
-      .execute();
+    let newUser
+
+    try {
+      newUser = await this.usersRepository
+        .createQueryBuilder('user')
+        .insert()
+        .into(User)
+        .values({
+          name: user.name,
+          surname: user.surname,
+          age: user.age,
+          telephone: user.telephone,
+          email: user.email,
+          password: user.password,
+          admin: false,
+          appNotification: user.appNotification,
+          emailNotification: user.appNotification,
+          intercomNotification: user.intercomNotification,
+          tagId: user.tagId,
+        })
+        .execute();
+    } catch(e) {
+      if (e.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException()
+      }
+    }
 
     return newUser.identifiers[0].userId
   }
