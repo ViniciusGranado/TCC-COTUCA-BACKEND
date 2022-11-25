@@ -5,9 +5,9 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Door } from 'src/doors/doors.entity';
-import { LoginDto, LoginResponse, TagRequestAnswer } from 'src/models/models';
-import { Package } from 'src/packages/packages.entity';
+import { Door } from '../doors/doors.entity';
+import { LoginDto, LoginResponse, TagRequestAnswer } from '../models/models';
+import { Package } from '../packages/packages.entity';
 import { Repository } from 'typeorm';
 import { Log } from '../logs/logs.entity';
 import { User } from './users.entity';
@@ -129,23 +129,27 @@ export class UsersService {
     return response;
   }
 
-  public create(user: UserModel) {
-    const nameExists: boolean = this.users.some(
-      (userIterated) => userIterated.name === user.name,
-    );
-    if (nameExists) {
-      throw new UnprocessableEntityException('this user name already exists.');
-    }
+  public async create(user: UserModel): Promise<number> {
+    const newUser = await this.usersRepository
+      .createQueryBuilder('user')
+      .insert()
+      .into(User)
+      .values({
+        name: user.name,
+        surname: user.surname,
+        age: user.age,
+        telephone: user.telephone,
+        email: user.email,
+        password: user.password,
+        admin: false,
+        appNotification: user.appNotification,
+        emailNotification: user.appNotification,
+        intercomNotification: user.intercomNotification,
+        tagId: user.tagId,
+      })
+      .execute();
 
-    const maxId: number = Math.max(...this.users.map((user) => user.userId));
-    const id: number = maxId + 1;
-
-    const userPost: UserModel = {
-      ...user,
-      userId: id,
-    };
-    this.users.push(userPost);
-    return userPost;
+    return newUser.identifiers[0].userId
   }
 
   public delete(id: number): void {

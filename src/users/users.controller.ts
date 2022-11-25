@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { LoginDto, LoginResponse, TagRequestAnswer } from 'src/models/models';
+import { LoginDto, LoginResponse, TagRequestAnswer } from '../models/models';
 import { UserModel } from './users.interface';
 import { UsersService } from './users.service';
 
@@ -32,7 +32,7 @@ export class UsersController {
   }
 
   @Post()
-  public create(@Body() user: UserModel): UserModel {
+  public create(@Body() user: UserModel): Promise<Number> {
     return this.usersService.create(user);
   }
 
