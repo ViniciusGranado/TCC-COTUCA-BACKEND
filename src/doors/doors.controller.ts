@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { DoorRequestDto, DoorResponse } from 'src/models/models';
+import { DoorRequestDto, DoorResponse } from '../models/models';
 import { DoorModel } from './doors.interface';
 import { DoorsService } from './doors.service';
 
