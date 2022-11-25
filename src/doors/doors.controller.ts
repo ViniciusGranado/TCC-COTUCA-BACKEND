@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { DoorRequestDto, DoorResponse } from '../models/models';
+import { DoorRequestDto, DoorResponse, DoorsListResponse } from '../models/models';
 import { DoorModel } from './doors.interface';
 import { DoorsService } from './doors.service';
 
@@ -17,7 +17,7 @@ export class DoorController {
   constructor(private readonly doorsService: DoorsService) {}
 
   @Get()
-  public findAll(): Array<DoorModel> {
+  public findAll(): Promise<DoorsListResponse[]> {
     return this.doorsService.findAll();
   }
   @Get(':id')

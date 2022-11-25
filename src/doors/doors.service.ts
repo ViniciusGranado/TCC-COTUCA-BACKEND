@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException, UnprocessableEntityException, PreconditionFailedException } from "@nestjs/common";
 import { DoorRequest } from "../doorRequest/doorRequest.entity";
-import { DoorRequestDto, DoorResponse } from "../models/models";
+import { DoorRequestDto, DoorResponse, DoorsListResponse } from "../models/models";
 import { Package } from "../packages/packages.entity";
 import { User } from "../users/users.entity";
 import { Repository } from "typeorm";
@@ -29,8 +29,40 @@ export class DoorsService {
   ) {}
 
   private doors: Array<DoorModel> = [];
-  public findAll(): Array<DoorModel> {
-    return this.doors;
+
+  public async findAll(): Promise<DoorsListResponse[]> {
+    const doors = await this.doorsRepository
+      .createQueryBuilder('door')
+      .getMany()
+
+
+    const doorResponse: DoorsListResponse[] = []
+
+    for (const door of doors) {
+      const doorItem: DoorsListResponse = { ...door }
+      console.log(doorItem)
+
+      if (doorItem.packageId) {
+        console.log('entrou')
+
+        const pckg = await this.packagesRepository
+          .createQueryBuilder('package')
+          .where('package.id = :id', { id: door.packageId})
+          .getOne()
+  
+        const user = await this.usersRepository
+          .createQueryBuilder('user')
+          .where('user.userId = :id', { id: pckg.userId })
+          .getOne()
+
+        doorItem.user = user
+      }
+
+      console.log(doorItem)
+      doorResponse.push(doorItem)
+    }
+
+    return doorResponse
   }
 
   public findOne(id: number): DoorModel {

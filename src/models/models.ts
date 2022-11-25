@@ -1,3 +1,4 @@
+import { Door } from "../doors/doors.entity";
 import { UserModel } from "../users/users.interface";
 
 export interface TagRequestAnswer {
@@ -25,4 +26,8 @@ export interface LoginDto {
 export interface LoginResponse {
   token: string;
   user: Omit<UserModel, 'password'>;
+}
+
+export type DoorsListResponse = Door & {
+  user?: UserModel;
 }
