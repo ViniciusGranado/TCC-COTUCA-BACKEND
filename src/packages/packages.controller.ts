@@ -8,6 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { Package } from './packages.entity';
 import { PackagesModel } from './packages.interface';
 import { PackagesService } from './packages.service';
 
@@ -23,6 +24,11 @@ export class PackagesController {
   @Get(':id')
   public findOne(@Param('id', ParseIntPipe) id: number): PackagesModel {
     return this.packagesService.findOne(id);
+  }
+
+  @Get('user/:userId')
+  public findAllByUserId(@Param('userId', ParseIntPipe) userId: number): Promise<Package[]> {
+    return this.packagesService.findAllByUserId(userId);
   }
 
   @Post()

@@ -4,10 +4,17 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { Package } from './packages.entity';
 import { PackagesModel } from './packages.interface';
 
 @Injectable()
 export class PackagesService {
+  constructor(
+    @Inject('PACKAGES_REPOSITORY')
+    private packagesRepository: Repository<Package>,
+  ) {}
+
   private packages: Array<PackagesModel> = [];
 
   public findAll(): Array<PackagesModel> {
@@ -20,6 +27,15 @@ export class PackagesService {
       throw new NotFoundException('Package not found.');
     }
     return pack;
+  }
+
+  public findAllByUserId(userId: number): Promise<Package[]> {
+    const packages = this.packagesRepository
+      .createQueryBuilder('package')
+      .where('package.userId = :userId', { userId })
+      .getMany()
+
+    return packages
   }
 
   public create(pack: PackagesModel) {
