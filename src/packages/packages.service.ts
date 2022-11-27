@@ -33,6 +33,7 @@ export class PackagesService {
     const packages = this.packagesRepository
       .createQueryBuilder('package')
       .where('package.userId = :userId', { userId })
+      .orderBy('package.receivementDate', 'DESC')
       .getMany()
 
     return packages
